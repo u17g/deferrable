@@ -61,7 +61,27 @@ await deferrable(async (defer): Promise<number> => {
   - `[undefined, error]` when the callback threw / rejected
 - **Error propagation**: if the callback fails, deferred callbacks still run, then the original error is re-thrown.
 - **Awaited sequentially**: deferred callbacks are awaited one by one (no parallel execution).
-- **Deferred callback errors are ignored**: if a deferred callback throws/rejects, it is swallowed and does not affect the final result.
+- **Deferred callback errors**: if a deferred callback throws/rejects, `deferrable` fails fast with that error (remaining deferred callbacks are not executed). If the main callback already failed, `deferrable` throws an `AggregateError` containing both errors.
+  - If you want **all** deferred callbacks to run even if one of them fails, catch errors inside the deferred callback itself.
+
+### Example: always run all deferred callbacks (catch inside defer)
+
+```ts
+await deferrable(async (defer): Promise<void> => {
+  defer(async () => {
+    await cleanupA().catch((err) => {
+      // ignore / log
+      console.error("cleanupA failed:", err);
+    });
+  });
+
+  defer(async () => {
+    await cleanupB().catch((err) => {
+      console.error("cleanupB failed:", err);
+    });
+  });
+});
+```
 
 ### Example: LIFO order
 
@@ -145,3 +165,10 @@ async function reserveInventory(_orderId: string): Promise<void> {
 }
 async function releaseInventory(_orderId: string): Promise<void> {}
 ```
+
+### Durable execution frameworks (Inngest / Temporal, etc.)
+
+`deferrable` can be used with durable execution frameworks such as Inngest or Temporal.
+Because deferred callbacks are **fail-fast**, a failure in cleanup/rollback will fail the run immediately, which helps avoid continuing a workflow in an inconsistent state.
+
+If you want a particular cleanup to be best-effort (i.e. not fail the run), catch errors inside the deferred callback (e.g. `await cleanup().catch(...)`).
