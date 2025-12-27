@@ -59,7 +59,7 @@ await deferrable(async (defer): Promise<number> => {
 - **Result passed to deferred callbacks**: each deferred callback receives a tuple `[value, error]`:
   - `[value, undefined]` when the callback resolved
   - `[undefined, error]` when the callback threw / rejected
-- **Error propagation**: if the callback fails, deferred callbacks still run, then the original error is re-thrown.
+- **Error propagation (main callback)**: if the callback fails, deferred callbacks still run; if none of them fails, the original error is thrown. (If a deferred callback fails, see below.)
 - **Awaited sequentially**: deferred callbacks are awaited one by one (no parallel execution).
 - **Deferred callback errors**: if a deferred callback throws/rejects, `deferrable` fails fast with that error (remaining deferred callbacks are not executed). If the main callback already failed, `deferrable` throws an `AggregateError` containing both errors.
   - If you want **all** deferred callbacks to run even if one of them fails, catch errors inside the deferred callback itself.
