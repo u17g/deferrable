@@ -81,9 +81,6 @@ export async function deferrable<T, E = Error>(
     try {
       await exec(result);
     } catch (error) {
-      if (mainError !== undefined) {
-        throw new AggregateError([mainError, error], "deferrable: multiple errors");
-      }
       throw error;
     }
   }

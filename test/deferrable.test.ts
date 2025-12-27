@@ -97,7 +97,7 @@ describe("deferrable", () => {
     expect(calls).toEqual(["third", "second"]);
   });
 
-  it("when the main function fails and a deferred callback fails, it throws an AggregateError containing both", async () => {
+  it("when the main function fails and a deferred callback fails, it throws the deferred error", async () => {
     const mainErr = new Error("main failed");
     const deferErr = new Error("defer failed");
 
@@ -115,10 +115,7 @@ describe("deferrable", () => {
       thrown = e;
     }
 
-    expect(thrown).toBeInstanceOf(AggregateError);
-    const ae = thrown as AggregateError;
-    expect(ae.errors.includes(mainErr)).toBe(true);
-    expect(ae.errors.includes(deferErr)).toBe(true);
+    expect(thrown).toBe(deferErr);
   });
 });
 
