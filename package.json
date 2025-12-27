@@ -2,6 +2,14 @@
   "name": "@u17g/deferrable",
   "description": "A tiny defer utility for JavaScript/TypeScript: register cleanup/rollback callbacks that run in LIFO order. Works in any runtime (Node.js, Bun, Deno, browsers).",
   "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/u17g/deferrable.git"
+  },
+  "bugs": {
+    "url": "https://github.com/u17g/deferrable/issues"
+  },
+  "homepage": "https://github.com/u17g/deferrable#readme",
   "types": "./dist/index.d.ts",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
